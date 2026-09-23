@@ -1,0 +1,53 @@
+# ============================================================
+# e-SpazaSethu — Local Developer Configuration
+# ============================================================
+# HOW TO USE THIS FILE:
+#
+# 1. Copy this file and rename the copy to:
+#    application-local.properties
+#
+# 2. Fill in YOUR local values below.
+#
+# 3. That's it. Spring Boot will automatically pick it up
+#    because application.properties sets:
+#    spring.profiles.active=local
+#
+# IMPORTANT:
+# - application-local.properties is in .gitignore
+# - NEVER commit application-local.properties to GitHub
+# - Each developer has their own copy with their own values
+# - This example file IS committed — it shows the team
+#   what variables they need without exposing real values
+# ============================================================
+
+
+# ------------------------------------------------------------
+# DATABASE — fill in your local MySQL credentials
+# ------------------------------------------------------------
+DB_USERNAME=root
+DB_PASSWORD=your_mysql_password_here
+DB_URL=jdbc:mysql://localhost:3306/espaza_db?createDatabaseIfNotExist=true
+
+# ------------------------------------------------------------
+# JWT — generate a strong secret before running the app
+#
+# To generate one, run this in your terminal:
+#   Mac/Linux: openssl rand -base64 64
+#   Windows:   go to https://generate-secret.vercel.app/64
+#
+# Paste the result below. Must be at least 64 characters.
+# ------------------------------------------------------------
+JWT_SECRET=replace-this-with-a-long-random-secret-at-least-64-characters-long
+JWT_EXPIRY_HOURS=8
+
+
+# ------------------------------------------------------------
+# CORS — the URL your React frontend runs on locally
+# ------------------------------------------------------------
+ALLOWED_ORIGIN=http://localhost:5173
+
+
+# ------------------------------------------------------------
+# SERVER — only change this if port 8080 is taken
+# ------------------------------------------------------------
+SERVER_PORT=8080
