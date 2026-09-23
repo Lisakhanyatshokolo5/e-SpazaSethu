@@ -1,4 +1,4 @@
-package com.samukelo.backend;
+package za.co.espaza.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
