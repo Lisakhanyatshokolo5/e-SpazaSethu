@@ -183,13 +183,16 @@ cp application-local.properties.example application-local.properties
 # then open application-local.properties and fill in your DB password and JWT secret
 ```
 
-Open `.env` and fill in your values:
+Open `application-local.properties` and fill in your values:
 
-```env
-DB_USERNAME=root
-DB_PASSWORD=your_mysql_password
-JWT_SECRET=a-long-random-secret-string-at-least-64-characters
-ALLOWED_ORIGIN=http://localhost:5173
+```bash
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.url=jdbc:mysql://localhost:3306/espaza_db?createDatabaseIfNotExist=true
+app.jwt.secret=your_generated_jwt_secret_here
+app.jwt.expiry-hours=8
+
+app.cors.allowed-origin=http://localhost:5173
 ```
 
 **5. Install dependencies and build**
