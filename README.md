@@ -103,7 +103,7 @@ e-spazasethu/                        # Monorepo root
 ├── backend/                         # Spring Boot app
 │   ├── src/
 │   │   ├── main/
-│   │   │   ├── java/za/co/espaza/
+│   │   │   ├── java/za/co/espaza/backend
 │   │   │   │   ├── config/          # Security config, CORS, beans
 │   │   │   │   ├── controller/      # REST controllers
 │   │   │   │   ├── dto/             # Request and response DTOs
@@ -119,7 +119,7 @@ e-spazasethu/                        # Monorepo root
 │   │   │       ├── application.properties
 │   │   │       └── schema.sql       # Database schema
 │   │   └── test/
-│   │       └── java/za/co/espaza/
+│   │       └── java/za/co/espaza/backend
 │   │           └── service/         # Unit tests (JUnit 5 + Mockito)
 │   ├── .env.example
 │   └── pom.xml
