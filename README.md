@@ -178,7 +178,9 @@ This creates all 8 tables and seeds a default admin user.
 **4. Configure environment variables**
 
 ```bash
-cp .env.example .env
+cd backend/src/main/resources
+cp application-local.properties.example application-local.properties
+# then open application-local.properties and fill in your DB password and JWT secret
 ```
 
 Open `.env` and fill in your values:
