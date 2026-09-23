@@ -462,3 +462,5 @@ fix: Correct cart total calculation for quantity > 1
 ---
 
 *Built with purpose for South African small businesses — e-SpazaSethu, ours.*
+
+<img width="1513" height="2310" alt="espaza-UML drawio" src="https://github.com/user-attachments/assets/96d7ea80-d06d-4f6c-9054-a405bc769bb0" />
