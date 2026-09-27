@@ -23,15 +23,15 @@ public class JwtUtil {
     @Value("${app.jwt.expiry-hours}")
     private int expiryHours;
 
-    // Converts the secret string into a cryptographic signing key
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Creates a token for a given user
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        // We store the role inside the token so we can read it later
+
         claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
 
         return Jwts.builder()
@@ -43,12 +43,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Reads the username out of a token
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Checks if the token belongs to this user and hasn't expired
+
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
