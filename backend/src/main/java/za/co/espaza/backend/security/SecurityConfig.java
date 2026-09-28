@@ -27,14 +27,20 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final CustomAuthEntryPoint customAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter,
-                          CustomUserDetailsService userDetailsService) {
+                          CustomUserDetailsService userDetailsService,
+                          CustomAuthEntryPoint customAuthEntryPoint,
+                          CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
+        this.customAuthEntryPoint = customAuthEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -61,7 +67,12 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
 
                 // Add our JWT filter BEFORE Spring's default login filter
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
+        );
 
         return http.build();
     }
