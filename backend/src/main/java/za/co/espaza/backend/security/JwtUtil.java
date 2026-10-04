@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -30,9 +31,17 @@ public class JwtUtil {
 
 
     public String generateToken(UserDetails userDetails) {
+        return generateToken(userDetails, null);
+    }
+
+
+    public String generateToken(UserDetails userDetails, UUID userId) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        if (userId != null) {
+            claims.put("userId", userId.toString());
+        }
 
         return Jwts.builder()
                 .claims(claims)
@@ -46,6 +55,26 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+
+    public UUID extractUserId(String token) {
+        String userId = extractClaim(token, claims -> claims.get("userId", String.class));
+        return userId == null ? null : UUID.fromString(userId);
+    }
+
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
+
+    public boolean isTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 
