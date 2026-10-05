@@ -35,13 +35,13 @@ import java.util.UUID;
 public class Sale {
 
     @Id
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "saleId", length = 36, nullable = false, updatable = false)
     private UUID saleId;
 
     // TODO (Backend Issue 1): replace with @ManyToOne @JoinColumn(name = "userId")
     // once the User entity exists. Stored as the raw FK column until then.
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "userId", length = 36, nullable = false)
     private UUID userId;
 

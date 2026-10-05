@@ -100,6 +100,6 @@ public class UserService {
 
     private UserResponse toResponse(User user) {
 
-        return new UserResponse(user.getUserId(), user.getUsername(), user.getRole(), user.getIsActive(), user.getLastLogin(), user.getCreatedAt());
+        return new UserResponse(user.getUserId(), user.getUsername(), user.getRole(), user.getIsActive(), user.getCreatedAt(), user.getLastLogin());
     }
 }

@@ -6,44 +6,38 @@ import za.co.espaza.backend.dto.request.StocktakeCountRequest;
 import za.co.espaza.backend.dto.response.StocktakeResponse;
 import za.co.espaza.backend.entity.Stocktake;
 import za.co.espaza.backend.entity.StocktakeItem;
+import za.co.espaza.backend.entity.Product;
+import za.co.espaza.backend.entity.StockMovement;
+import za.co.espaza.backend.Enum.MovementType;
 import za.co.espaza.backend.enums.StocktakeStatus;
 import za.co.espaza.backend.exception.BusinessRuleException;
 import za.co.espaza.backend.exception.EntityNotFoundException;
 import za.co.espaza.backend.repository.StocktakeRepository;
+import za.co.espaza.backend.repository.ProductRepository;
+import za.co.espaza.backend.repository.StockMovementRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Stocktake business logic (Backend Issue 16).
- *
- * <p><strong>Partially implemented.</strong> {@code submitCounts}, {@code getStocktakesForUser}
- * and {@code getStocktakeById} work with the entities that exist today. {@code startStocktake}
- * and {@code applyAdjustments} are blocked until the missing dependency entities land:</p>
- * <ul>
- *   <li>{@code Product} (Backend Issue 2) — to snapshot active products / adjust stock</li>
- *   <li>{@code StockMovement} + its type enum (Backend Issues 9/12) — to record corrections</li>
- *   <li>{@code User} (Backend Issue 1) — only if the {@code conductedBy} FK must become an association</li>
- * </ul>
- */
+/** Coordinates the stocktake snapshot, counts and resulting stock corrections. */
 @Service
 public class StocktakeService {
 
     private final StocktakeRepository stocktakeRepository;
+    private final ProductRepository productRepository;
+    private final StockMovementRepository movementRepository;
 
-    public StocktakeService(StocktakeRepository stocktakeRepository) {
+    public StocktakeService(StocktakeRepository stocktakeRepository,
+                            ProductRepository productRepository,
+                            StockMovementRepository movementRepository) {
         this.stocktakeRepository = stocktakeRepository;
+        this.productRepository = productRepository;
+        this.movementRepository = movementRepository;
     }
 
-    /**
-     * Starts a new stocktake.
-     *
-     * <p>BLOCKED: creating one {@link StocktakeItem} per active product requires the
-     * {@code Product} entity ({@code productRepository.findByActiveTrue()} and
-     * {@code product.getStockQuantity()} / {@code product.getProductId()}) from Backend Issue 2.</p>
-     */
+    /** Starts a stocktake by snapshotting every active product's current quantity. */
     @Transactional
     public StocktakeResponse startStocktake(UUID userId) {
         stocktakeRepository.findByStatusAndConductedBy(StocktakeStatus.IN_PROGRESS, userId)
@@ -51,9 +45,10 @@ public class StocktakeService {
                     throw new BusinessRuleException("A stocktake is already in progress");
                 });
 
-        throw new UnsupportedOperationException(
-                "startStocktake is blocked: the Product entity (Backend Issue 2) is required to "
-                        + "snapshot active products and their system quantities");
+        Stocktake stocktake = new Stocktake(userId, null);
+        productRepository.findByIsActiveTrue().forEach(product ->
+                stocktake.addItem(new StocktakeItem(product.getProductId(), product.getStockQuantity())));
+        return toResponse(stocktakeRepository.save(stocktake));
     }
 
     /** Records physical counts and derives each item's discrepancy. */
@@ -80,20 +75,33 @@ public class StocktakeService {
         return toResponse(stocktake);
     }
 
-    /**
-     * Applies the counted discrepancies and completes the stocktake.
-     *
-     * <p>BLOCKED: applying requires the {@code Product} entity to change
-     * {@code product.stockQuantity} (Backend Issue 2) and a {@code StockMovement}
-     * of type {@code STOCKTAKE_CORRECTION} (Backend Issues 9/12).</p>
-     */
+    /** Applies each counted discrepancy, records the audit trail and completes the stocktake. */
     @Transactional
     public StocktakeResponse applyAdjustments(UUID stocktakeId, UUID userId) {
-        getInProgressStocktake(stocktakeId);
+        Stocktake stocktake = getInProgressStocktake(stocktakeId);
 
-        throw new UnsupportedOperationException(
-                "applyAdjustments is blocked: Product (Backend Issue 2) is required to update stock "
-                        + "and StockMovement (Backend Issues 9/12) is required to record corrections");
+        for (StocktakeItem item : stocktake.getItems()) {
+            if (item.getCountedQuantity() == null || item.getDiscrepancy() == null || item.getDiscrepancy() == 0) {
+                continue;
+            }
+            Product product = productRepository.findByIdForUpdate(item.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found: " + item.getProductId()));
+            product.setStockQuantity(item.getCountedQuantity());
+            productRepository.save(product);
+
+            StockMovement movement = new StockMovement();
+            movement.setProductId(product.getProductId());
+            movement.setCreatedBy(userId.toString());
+            movement.setQuantityChange(item.getDiscrepancy());
+            movement.setMovementType(MovementType.STOCKTAKE_CORRECTION);
+            movement.setReferenceId(stocktakeId.toString());
+            movement.setNotes("Stocktake correction");
+            movementRepository.save(movement);
+            item.applyAdjustment();
+        }
+
+        stocktake.complete();
+        return toResponse(stocktakeRepository.save(stocktake));
     }
 
     @Transactional(readOnly = true)
@@ -121,8 +129,10 @@ public class StocktakeService {
     }
 
     private StocktakeResponse toResponse(Stocktake stocktake) {
-        // TODO (Backend Issue 2): populate product names from ProductRepository once the
-        // Product entity exists. Until then item productName is null.
-        return StocktakeResponse.from(stocktake);
+        Map<String, String> productNames = productRepository.findAllById(
+                        stocktake.getItems().stream().map(StocktakeItem::getProductId).toList())
+                .stream()
+                .collect(Collectors.toMap(Product::getProductId, Product::getName));
+        return StocktakeResponse.from(stocktake, productNames);
     }
 }

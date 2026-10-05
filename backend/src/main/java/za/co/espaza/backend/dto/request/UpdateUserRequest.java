@@ -18,7 +18,7 @@ public class UpdateUserRequest {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         isActive = active;
     }
 }

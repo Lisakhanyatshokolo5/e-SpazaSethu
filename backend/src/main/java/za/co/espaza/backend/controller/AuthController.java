@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import za.co.espaza.backend.security.UserPrincipal;
+import za.co.espaza.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,13 +17,16 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           CustomUserDetailsService userDetailsService,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -41,15 +45,17 @@ public class AuthController {
         }
 
         // If we get here, credentials are valid — generate a token
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
-        String token = jwtUtil.generateToken(userDetails);
+        UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(request.username());
+        String token = jwtUtil.generateToken(userDetails, userDetails.getUserId());
+        userService.updateLastLogin(userDetails.getUserId().toString());
 
-        // TODO: Once UserRepository exists, load the real userId and role from DB
-        // For now this returns a placeholder userId
+        String authority = userDetails.getAuthorities().iterator().next().getAuthority();
         LoginResponse response = new LoginResponse(
                 token,
-                new LoginResponse.UserInfo("temp-id", request.username(),
-                        userDetails.getAuthorities().iterator().next().getAuthority())
+                new LoginResponse.UserInfo(
+                        userDetails.getUserId().toString(),
+                        userDetails.getUsername(),
+                        authority.replaceFirst("^ROLE_", ""))
         );
 
         return ResponseEntity.ok(response);

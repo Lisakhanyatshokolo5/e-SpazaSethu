@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record StocktakeItemResponse(
         UUID stocktakeItemId,
-        UUID productId,
+        String productId,
         String productName,
         int systemQuantity,
         Integer countedQuantity,

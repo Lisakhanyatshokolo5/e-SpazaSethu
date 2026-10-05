@@ -33,7 +33,7 @@ public class UserResponse {
         return role;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 

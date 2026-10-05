@@ -1,25 +1,39 @@
 package za.co.espaza.backend.entity;
 
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import za.co.espaza.backend.exception.BusinessRuleException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "product")
 public class Product {
+    @Id
+    @Column(name = "productId", length = 36, nullable = false, updatable = false)
     private String productId;
+    @Column(nullable = false, length = 200)
     private String name;
+    @Column(length = 100, unique = true)
     private String barcode;
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal sellingPrice;
+    @Column(precision = 10, scale = 2)
     private BigDecimal costPrice;
+    @Column(nullable = false)
     private Integer stockQuantity;
     private Integer lowStockThreshold;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId")
     private Category category;
+    @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(nullable = false)
     private Boolean isActive;
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist

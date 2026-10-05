@@ -67,8 +67,8 @@ export interface SaleSummary {
 }
 
 // --- Sales ---
-export type PaymentMethod = 'Cash' | 'Card' | 'Mobile';
-export type SaleStatus = 'Completed' | 'Cancelled';
+export type PaymentMethod = 'CASH' | 'CARD' | 'MOBILE_PAYMENT';
+export type SaleStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
 
 export interface SaleItem {
     productId: string;

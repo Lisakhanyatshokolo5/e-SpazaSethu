@@ -5,6 +5,7 @@ import { ShoppingBag, User, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import type { User as UserType } from '../types';
+import axios from 'axios';
 
 interface LoginResponse {
     token: string;
@@ -51,10 +52,10 @@ export default function LoginPage() {
             });
             login(data.token, data.user);
             navigate(from, { replace: true });
-        } catch (err: any) {
-            if (err?.response?.status === 401) {
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err) && err.response?.status === 401) {
                 setError({ message: 'Incorrect username or password. Please try again.' });
-            } else if (!err?.response) {
+            } else if (axios.isAxiosError(err) && !err.response) {
                 setError({ message: 'Could not connect to the server. Please check your connection.' });
             } else {
                 setError({ message: 'Something went wrong. Please try again.' });

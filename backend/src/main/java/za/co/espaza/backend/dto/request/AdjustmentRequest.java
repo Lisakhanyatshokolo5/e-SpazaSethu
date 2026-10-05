@@ -1,11 +1,16 @@
 package za.co.espaza.backend.dto.request;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.NotFound;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class AdjustmentRequest {
+    @NotBlank(message = "Product id is required")
     private String productId;
+    @NotNull(message = "Quantity change is required")
     private Integer quantityChange;
+    @NotBlank(message = "Adjustment notes are required")
+    @Size(max = 1000, message = "Adjustment notes must be 1000 characters or fewer")
     private String notes;
 
     public AdjustmentRequest(){
