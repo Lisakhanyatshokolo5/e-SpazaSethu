@@ -32,6 +32,14 @@ export interface Product {
     categoryName?: string;
     description?: string;
     isActive: boolean;
+    lowStock?: boolean;
+    active?: boolean;
+}
+
+export interface Category {
+    categoryId: string;
+    name: string;
+    description: string;
 }
 
 // --- Cart (POS) ---
