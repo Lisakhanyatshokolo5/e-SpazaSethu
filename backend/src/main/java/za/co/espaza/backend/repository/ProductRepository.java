@@ -1,6 +1,19 @@
 package za.co.espaza.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
+import org.springframework.stereotype.Repository;
+import za.co.espaza.backend.domain.Product;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, UUID> {
+
+    // All products that are still active (used when starting a stocktake)
+    List<Product> findByActiveTrue();
+=======
 import org.springframework.data.jpa.repository.Query;
 import za.co.espaza.backend.entity.Product;
 
@@ -23,4 +36,5 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
             """)
     List<Product> findLowStockProducts();
 
+>>>>>>> 980971711850d9a8eea62261251ae384a4344f17
 }

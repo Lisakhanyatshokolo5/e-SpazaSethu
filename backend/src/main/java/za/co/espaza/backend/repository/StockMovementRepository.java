@@ -1,6 +1,15 @@
 package za.co.espaza.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
+import org.springframework.stereotype.Repository;
+import za.co.espaza.backend.domain.StockMovement;
+
+import java.util.UUID;
+
+@Repository
+public interface StockMovementRepository extends JpaRepository<StockMovement, UUID> {
+=======
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import za.co.espaza.backend.Enum.MovementType;
@@ -36,4 +45,5 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, St
             @Param("fromDate") LocalDateTime fromDate,
             @Param("toDate") LocalDateTime toDate
     );
+>>>>>>> 980971711850d9a8eea62261251ae384a4344f17
 }
