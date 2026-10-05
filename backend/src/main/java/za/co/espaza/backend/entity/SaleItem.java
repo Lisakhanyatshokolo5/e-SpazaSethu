@@ -32,7 +32,7 @@ import java.util.UUID;
 public class SaleItem {
 
     @Id
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "saleItemId", length = 36, nullable = false, updatable = false)
     private UUID saleItemId;
 
@@ -47,14 +47,13 @@ public class SaleItem {
      * resolves directly to this column without needing a join. Only the
      * association writes it.
      */
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "saleId", length = 36, nullable = false, insertable = false, updatable = false)
     private UUID saleId;
 
     // TODO (Backend Issue 2): add the lazy @ManyToOne Product association here.
-    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "productId", length = 36, nullable = false)
-    private UUID productId;
+    private String productId;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
@@ -69,7 +68,7 @@ public class SaleItem {
     protected SaleItem() {
     }
 
-    public SaleItem(UUID productId, int quantity, BigDecimal unitPrice) {
+    public SaleItem(String productId, int quantity, BigDecimal unitPrice) {
         this.productId = productId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
@@ -98,7 +97,7 @@ public class SaleItem {
         return sale != null ? sale.getSaleId() : saleId;
     }
 
-    public UUID getProductId() {
+    public String getProductId() {
         return productId;
     }
 

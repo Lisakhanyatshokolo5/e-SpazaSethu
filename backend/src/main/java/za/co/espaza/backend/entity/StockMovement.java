@@ -1,9 +1,7 @@
 package za.co.espaza.backend.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import za.co.espaza.backend.Enum.MovementType;
 
 import java.time.LocalDateTime;
@@ -13,29 +11,35 @@ import java.util.UUID;
 @Table(name = "stock_movement")
 public class StockMovement {
     @Id
+    @Column(name = "movementId", length = 36, nullable = false, updatable = false)
     private String movementId;
+    @Column(nullable = false, length = 36)
     private String productId;
-    private String userId;
+    @Column(nullable = false, length = 36)
     private String createdBy;
+    @Column(nullable = false)
     private Integer quantityChange;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private MovementType movementType;
+    @Column(length = 36)
     private String referenceId;
+    @Column(columnDefinition = "TEXT")
     private String notes;
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public StockMovement() {
 
     }
 
+    @PrePersist
     protected void onCreate(){
         if(movementId == null){
             movementId = UUID.randomUUID().toString();
         }
         if(createdAt == null){
             createdAt = LocalDateTime.now();
-        }
-        if(createdBy == null){
-            createdBy = UUID.randomUUID().toString();
         }
     }
 
@@ -53,14 +57,6 @@ public class StockMovement {
 
     public void setProductId(String productId) {
         this.productId = productId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public Integer getQuantityChange() {

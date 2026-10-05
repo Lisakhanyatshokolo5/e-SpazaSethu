@@ -48,6 +48,15 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(404, "Not Found", ex.getMessage(), request.getRequestURI()));
     }
 
+    @ExceptionHandler({jakarta.persistence.EntityNotFoundException.class, ResourceNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleOtherNotFoundExceptions(
+            RuntimeException ex,
+            HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(404, "Not Found", ex.getMessage(), request.getRequestURI()));
+    }
+
     // ── Business rule violations ──────────────────────────────────────────────
     // Thrown when valid data breaks a business rule, e.g. stock going below zero.
     // 422 Unprocessable Entity is more accurate than 400 here because the

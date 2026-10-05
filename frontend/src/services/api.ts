@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL as string,
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
 });
 
 // Attach JWT to every request
@@ -17,8 +17,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const isLoginRequest = error.config?.url === '/auth/login';
+        if (error.response?.status === 401 && !isLoginRequest) {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             window.location.href = '/login';
         }
         return Promise.reject(error);

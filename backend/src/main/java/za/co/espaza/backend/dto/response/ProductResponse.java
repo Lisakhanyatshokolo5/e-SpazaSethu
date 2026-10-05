@@ -89,7 +89,7 @@ public class ProductResponse {
         return description;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 

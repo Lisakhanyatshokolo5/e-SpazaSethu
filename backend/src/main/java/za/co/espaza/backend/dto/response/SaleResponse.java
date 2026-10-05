@@ -12,7 +12,8 @@ import java.util.UUID;
 
 public record SaleResponse(
         UUID saleId,
-        UUID userId,
+        UUID cashierId,
+        String cashierName,
         LocalDateTime saleDateTime,
         BigDecimal totalAmount,
         PaymentMethod paymentMethod,
@@ -23,10 +24,10 @@ public record SaleResponse(
 ) {
 
     public static SaleResponse from(Sale sale) {
-        return from(sale, Map.of());
+        return from(sale, null, Map.of());
     }
 
-    public static SaleResponse from(Sale sale, Map<UUID, String> productNames) {
+    public static SaleResponse from(Sale sale, String cashierName, Map<String, String> productNames) {
         List<SaleItemResponse> items = sale.getItems().stream()
                 .map(item -> SaleItemResponse.from(item, productNames.get(item.getProductId())))
                 .toList();
@@ -34,6 +35,7 @@ public record SaleResponse(
         return new SaleResponse(
                 sale.getSaleId(),
                 sale.getUserId(),
+                cashierName,
                 sale.getSaleDateTime(),
                 sale.getTotalAmount(),
                 sale.getPaymentMethod(),

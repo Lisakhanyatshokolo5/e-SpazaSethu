@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import type { Sale, SalesReportSummary, PaginatedResponse } from '../types';
+import type { Sale, SalesReportSummary } from '../types';
 
 type Preset = 'today' | 'yesterday' | 'last7' | 'custom';
 
@@ -21,7 +21,7 @@ const getRangeForPreset = (preset: Preset): { from: string; to: string } => {
 };
 
 const statusBadgeClass = (status: string) =>
-    status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+    status.toUpperCase() === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
 
 const SalesHistoryPage = () => {
     const [preset, setPreset] = useState<Preset>('today');
@@ -29,9 +29,8 @@ const SalesHistoryPage = () => {
     const [to, setTo] = useState(() => getRangeForPreset('today').to);
     const [sales, setSales] = useState<Sale[]>([]);
     const [summary, setSummary] = useState<SalesReportSummary | null>(null);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const applyPreset = (p: Preset) => {
         setPreset(p);
@@ -40,19 +39,20 @@ const SalesHistoryPage = () => {
             setFrom(range.from);
             setTo(range.to);
         }
-        setPage(1);
     };
 
-    const loadData = useCallback(async (pageNum: number, append: boolean) => {
+    const loadData = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const [salesRes, summaryRes] = await Promise.all([
-                api.get<PaginatedResponse<Sale>>(`/sales?from=${from}&to=${to}&page=${pageNum}`),
+                api.get<Sale[]>(`/sales?from=${from}&to=${to}`),
                 api.get<SalesReportSummary>(`/reports/summary?from=${from}&to=${to}`),
             ]);
-            setSales((prev) => (append ? [...prev, ...salesRes.data.data] : salesRes.data.data));
-            setTotalPages(salesRes.data.totalPages);
+            setSales(salesRes.data);
             setSummary(summaryRes.data);
+        } catch {
+            setError("Couldn't load sales for this period.");
         } finally {
             setLoading(false);
         }
@@ -60,14 +60,8 @@ const SalesHistoryPage = () => {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch requires a loading flag
-        void loadData(1, false);
+        void loadData();
     }, [loadData]);
-
-    const handleLoadMore = () => {
-        const next = page + 1;
-        setPage(next);
-        void loadData(next, true);
-    };
 
     return (
         <div className="p-4 pb-24">
@@ -91,14 +85,14 @@ const SalesHistoryPage = () => {
                 <input
                     type="date"
                     value={from}
-                    onChange={(e) => { setFrom(e.target.value); setPreset('custom'); setPage(1); }}
+                    onChange={(e) => { setFrom(e.target.value); setPreset('custom'); }}
                     className="border rounded p-2"
                 />
                 <span>to</span>
                 <input
                     type="date"
                     value={to}
-                    onChange={(e) => { setTo(e.target.value); setPreset('custom'); setPage(1); }}
+                    onChange={(e) => { setTo(e.target.value); setPreset('custom'); }}
                     className="border rounded p-2"
                 />
             </div>
@@ -116,7 +110,12 @@ const SalesHistoryPage = () => {
                 </div>
             )}
 
-            {sales.length === 0 && !loading ? (
+            {error ? (
+                <div className="text-sm text-red-600">
+                    <p>{error}</p>
+                    <button onClick={() => void loadData()} className="mt-2 underline">Retry</button>
+                </div>
+            ) : sales.length === 0 && !loading ? (
                 <p className="text-sm text-gray-500">No sales found for this period.</p>
             ) : (
                 <ul className="divide-y">
@@ -143,15 +142,7 @@ const SalesHistoryPage = () => {
                 </ul>
             )}
 
-            {page < totalPages && (
-                <button
-                    onClick={handleLoadMore}
-                    disabled={loading}
-                    className="w-full mt-4 py-2 rounded border text-sm"
-                >
-                    {loading ? 'Loading...' : 'Load more'}
-                </button>
-            )}
+            {loading && <p className="mt-4 text-sm text-gray-500">Loading...</p>}
         </div>
     );
 };

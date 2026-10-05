@@ -3,7 +3,6 @@ package za.co.espaza.backend.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import za.co.espaza.backend.entity.User;
 
-import javax.management.relation.Role;
 import java.util.List;
 import java.util.Optional;
 

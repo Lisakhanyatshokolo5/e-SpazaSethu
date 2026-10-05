@@ -4,25 +4,34 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import za.co.espaza.backend.entity.User;
+import za.co.espaza.backend.repository.UserRepository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    // This will be injected once Lisakhanya creates UserRepository
-    // private final UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // TODO: Replace this with real DB lookup once UserRepository exists:
-        // UserEntity user = userRepository.findByUsername(username)
-        //     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-        // return new User(
-        //     user.getUsername(),
-        //     user.getPasswordHash(),
-        //     List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-        // );
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        throw new UsernameNotFoundException("User not found: " + username);
+        return new UserPrincipal(
+                UUID.fromString(user.getUserId()),
+                user.getUsername(),
+                user.getPasswordHash(),
+                Boolean.TRUE.equals(user.getIsActive()),
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
 
     }
 }

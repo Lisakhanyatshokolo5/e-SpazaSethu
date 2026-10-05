@@ -1,7 +1,6 @@
 package za.co.espaza.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.espaza.backend.Enum.MovementType;
@@ -20,7 +19,6 @@ import java.util.List;
 @Service
 @Transactional
 public class StockMovementService {
-    @Autowired
     private final StockMovementRepository movementRepository;
     private final ProductRepository productRepository;
 
@@ -76,7 +74,7 @@ public class StockMovementService {
         movement.setProductId(product.getProductId());
         movement.setMovementType(MovementType.ADJUSTMENT);
         movement.setQuantityChange(quantityChange);
-        movement.setUserId(userId);
+        movement.setCreatedBy(userId);
         movement.setNotes(request.getNotes().trim());
 
         StockMovement savedMovement =
@@ -131,7 +129,7 @@ public class StockMovementService {
                 movement.getMovementType(),
                 movement.getQuantityChange(),
                 movement.getReferenceId(),
-                movement.getUserId(),
+                movement.getCreatedBy(),
                 movement.getNotes(),
                 movement.getCreatedAt()
         );

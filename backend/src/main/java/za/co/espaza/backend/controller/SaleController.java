@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import za.co.espaza.backend.dto.request.CreateSaleRequest;
+import za.co.espaza.backend.security.CurrentUserService;
 import za.co.espaza.backend.dto.response.SaleResponse;
 import za.co.espaza.backend.services.SaleService;
 
@@ -21,9 +27,17 @@ import java.util.UUID;
 public class SaleController {
 
     private final SaleService saleService;
+    private final CurrentUserService currentUserService;
 
-    public SaleController(SaleService saleService) {
+    public SaleController(SaleService saleService, CurrentUserService currentUserService) {
         this.saleService = saleService;
+        this.currentUserService = currentUserService;
+    }
+
+    @PostMapping
+    public ResponseEntity<SaleResponse> createSale(@Valid @RequestBody CreateSaleRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(saleService.createSale(request, currentUserService.getCurrentUserId()));
     }
 
     // GET /api/v1/sales?from=2026-01-01&to=2026-01-31  (all roles)

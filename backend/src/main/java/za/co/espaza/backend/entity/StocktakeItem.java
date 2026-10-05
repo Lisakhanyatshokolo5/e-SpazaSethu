@@ -30,7 +30,7 @@ import java.util.UUID;
 public class StocktakeItem {
 
     @Id
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "stocktakeItemId", length = 36, nullable = false, updatable = false)
     private UUID stocktakeItemId;
 
@@ -44,14 +44,13 @@ public class StocktakeItem {
      * {@link #stocktake} association so the derived query {@code findByStocktakeId(...)}
      * resolves directly to this column without needing a join. Only the association writes it.
      */
-    @JdbcTypeCode(SqlTypes.CHAR)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "stocktakeId", length = 36, nullable = false, insertable = false, updatable = false)
     private UUID stocktakeId;
 
     // TODO (Backend Issue 2): add the lazy @ManyToOne Product association here.
-    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "productId", length = 36, nullable = false)
-    private UUID productId;
+    private String productId;
 
     @Column(name = "systemQuantity", nullable = false)
     private int systemQuantity;
@@ -71,7 +70,7 @@ public class StocktakeItem {
     protected StocktakeItem() {
     }
 
-    public StocktakeItem(UUID productId, int systemQuantity) {
+    public StocktakeItem(String productId, int systemQuantity) {
         this.productId = productId;
         this.systemQuantity = systemQuantity;
     }
@@ -111,7 +110,7 @@ public class StocktakeItem {
         return stocktake != null ? stocktake.getStocktakeId() : stocktakeId;
     }
 
-    public UUID getProductId() {
+    public String getProductId() {
         return productId;
     }
 

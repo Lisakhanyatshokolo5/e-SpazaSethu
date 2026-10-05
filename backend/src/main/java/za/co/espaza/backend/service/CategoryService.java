@@ -2,6 +2,7 @@ package za.co.espaza.backend.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 import za.co.espaza.backend.dto.response.CategoryResponse;
 import za.co.espaza.backend.dto.request.CreateCategoryRequest;
 import za.co.espaza.backend.dto.request.UpdateCategoryRequest;
@@ -13,6 +14,7 @@ import za.co.espaza.backend.repository.ProductRepository;
 
 import java.util.List;
 
+@Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;

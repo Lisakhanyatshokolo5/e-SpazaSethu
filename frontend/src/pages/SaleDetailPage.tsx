@@ -39,6 +39,7 @@ const PAYMENT_LABELS: Record<string, string> = {
     CASH: 'Cash',
     CARD: 'Card',
     MOBILE: 'Mobile',
+    MOBILE_PAYMENT: 'Mobile Payment',
 };
 
 function formatSaleDateTime(iso: string): string {

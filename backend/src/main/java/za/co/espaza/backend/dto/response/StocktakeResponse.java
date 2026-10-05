@@ -22,7 +22,7 @@ public record StocktakeResponse(
         return from(stocktake, Map.of());
     }
 
-    public static StocktakeResponse from(Stocktake stocktake, Map<UUID, String> productNames) {
+    public static StocktakeResponse from(Stocktake stocktake, Map<String, String> productNames) {
         List<StocktakeItemResponse> items = stocktake.getItems().stream()
                 .map(item -> StocktakeItemResponse.from(item, productNames.get(item.getProductId())))
                 .toList();

@@ -48,14 +48,15 @@ export default function DashboardPage() {
     const loadDashboard = useCallback(async () => {
         setState('loading');
         try {
+            const today = new Date().toISOString().split('T')[0];
             const [dashboardRes, lowStockRes, salesRes] = await Promise.all([
                 api.get<DashboardData>('/reports/dashboard'),
                 api.get<LowStockProduct[]>('/products/low-stock'),
-                api.get<SaleSummary[]>('/sales', { params: { from: 'TODAY', to: 'TODAY', limit: 5 } }),
+                api.get<SaleSummary[]>('/sales', { params: { from: today, to: today } }),
             ]);
             setDashboard(dashboardRes.data);
             setLowStock(lowStockRes.data);
-            setRecentSales(salesRes.data);
+            setRecentSales(salesRes.data.slice(0, 5));
             setState('success');
         } catch {
             setState('error');
